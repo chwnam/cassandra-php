@@ -8,6 +8,43 @@ require_once 'compatibility-functions.php';
 define( 'WSKL_HOST_API_URL', 'https://www.dabory.com/cassandra/api/v1' );  // do not add slashes
 define( 'WSKL_ALTERNATE_HOST_API_URL', 'http://www.dabory.com/cassandra/api/v1' );
 
+if ( ! has_action(
+	'http_api_curl',
+	'\wskl\lib\cassandra\add_encrypt_algorithms'
+)
+) {
+	add_action(
+		'http_api_curl',
+		'\wskl\lib\cassandra\add_encrypt_algorithms',
+		10,
+		3
+	);
+}
+
+if ( ! function_exists( '\CassandraPHP\add_encrypt_algorithms' ) ) {
+
+	/**
+	 * CloudFlare's Universal SSL has some issues with some version of CURL
+	 *
+	 * @see https://www.reddit.com/r/Wordpress/comments/35tdo7/ecdsa_ssl_curl_oneline_fix_for_cloudlares/
+	 * @see https://community.centminmod.com/threads/wp-cron-ssl-connect-error-with-cloudflare-ssl-ecdsa.2276/
+	 *
+	 * @param resource $handle
+	 * @param array    $r
+	 * @param string   $url
+	 */
+	function add_encrypt_algorithms( $handle, $r, $url ) {
+
+		if ( $url == WSKL_HOST_API_URL ) {
+			curl_setopt(
+				$handle,
+				CURLOPT_SSL_CIPHER_LIST,
+				'ecdhe_ecdsa_aes_128_sha'
+			);
+		}
+	}
+}
+
 /**
  * Prepared for CloudFlare Flexible SSL.
  *
