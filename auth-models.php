@@ -180,6 +180,21 @@ final class Key extends CreatedUpdatedMixin implements APIResponseHandler {
 
 		return $this->expire_date;
 	}
+
+	public function is_expired() {
+
+		$today = new \DateTime();
+
+		return $today < $this->issue_date || $today > $this->expire_date;
+	}
+
+	public function get_days_left() {
+
+		$today = new \DateTime( 'now', new \DateTimeZone( 'Asia/Seoul' ) );
+		$interval = $today->diff( $this->expire_date );
+
+		return $interval->invert == 0 ? $interval->days : FALSE;
+	}
 }
 
 
