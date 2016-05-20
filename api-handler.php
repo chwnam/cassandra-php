@@ -730,8 +730,9 @@ class OrderItemAPI {
 		assert( $order->get_item_count() == 1, 'We allow only one item per order.' );
 
 		$response = array();
+		$order_items = $order->get_items();
 
-		foreach ( $order->get_items() as $order_item_id => &$order_item ) {
+		foreach ( $order_items as $order_item_id => &$order_item ) {
 			assert( $order_item['qty'] == 1, 'We allow only one item per order.' );
 			try {
 				$response = static::get( $order_item_id );
